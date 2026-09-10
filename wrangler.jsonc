@@ -1,0 +1,27 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "hoursync-we",
+	"compatibility_date": "2026-08-03",
+	"compatibility_flags": ["nodejs_compat", "nodejs_als"],
+	"pages_build_output_dir": ".svelte-kit/cloudflare",
+	"observability": {
+		"enabled": true,
+	},
+	"upload_source_maps": true,
+	"d1_databases": [
+		{
+			"binding": "draftDB",
+			"database_name": "hoursync-drafts",
+			"database_id": "b71cc249-0b2a-4d32-a40f-6cbbc6e5ebb4",
+		},
+		{
+			"binding": "userDB",
+			"database_name": "hoursyncUsers",
+			"database_id": "b859090b-162a-4ad9-a975-6308fc2619fc",
+		},
+	],
+}

@@ -1,0 +1,33 @@
+{
+	"name": "hoursync-we",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "wrangler types --check && vite build",
+		"preview": "npm run build && wrangler pages dev",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "wrangler types --check && svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch",
+		"gen": "wrangler types",
+		"deploy": "npm run build && wrangler pages deploy"
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-cloudflare": "^7.2.9",
+		"@sveltejs/kit": "^2.63.0",
+		"@sveltejs/vite-plugin-svelte": "^7.1.2",
+		"svelte": "^5.56.1",
+		"svelte-check": "^4.6.0",
+		"typescript": "^6.0.3",
+		"vite": "^8.0.16",
+		"wrangler": "^4.118.0"
+	},
+	"dependencies": {
+		"@cloudflare/workers-types": "^5.20260813.1",
+		"axios": "^1.19.0",
+		"axios-cookiejar-support": "^7.0.0",
+		"cheerio": "^1.2.0",
+		"tough-cookie": "^6.0.2"
+	}
+}

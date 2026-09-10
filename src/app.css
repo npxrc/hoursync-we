@@ -1,0 +1,33 @@
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@200..800&display=swap");
+
+:root {
+	--light-text: #f8fafc;
+	--dark-text: #000;
+
+	--ink: #111827;
+	--slate: rgb(30, 30, 30);
+	--surface: #fff;
+	--surface-alt: #f8fafc;
+
+	--gradient-1: #ea6044;
+	--gradient-2: #dc5083;
+	--gradient-3: #9a6df7;
+	--gradient-4: #3f8def;
+
+	--primary: var(--gradient-4);
+
+	--font: "Manrope";
+	--bold-font-weight: 700;
+}
+
+* {
+	font-family: var(--font);
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-weight: var(--bold-font-weight);
+}

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Light" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1024 1024">
+  <defs>
+    <style>
+      .cls-1, .cls-2 {
+        fill: none;
+        stroke: #fff;
+        stroke-miterlimit: 10;
+        stroke-width: 105px;
+      }
+
+      .cls-3, .cls-4 {
+        fill: #fff;
+      }
+
+      .cls-3, .cls-5 {
+        opacity: .85;
+      }
+
+      .cls-5 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-2 {
+        stroke-linecap: round;
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="2502.08" y1="-330.96" x2="3399.49" y2="-1228.37" gradientTransform="translate(-2438.7849 1291.6647)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e96143"/>
+      <stop offset=".33" stop-color="#dc5082"/>
+      <stop offset=".67" stop-color="#9a6df7"/>
+      <stop offset="1" stop-color="#3f8def"/>
+    </linearGradient>
+  </defs>
+  <rect id="Gradient" class="cls-3" x="0" y="0" width="1024" height="1024" rx="216.1" ry="216.1" transform="translate(0 1024) rotate(-90)"/>
+  <rect id="Gradient-2" data-name="Gradient" class="cls-5" x="0" y="0" width="1024" height="1024" rx="216.1" ry="216.1" transform="translate(0 1024) rotate(-90)"/>
+  <line class="cls-1" x1="367.63" y1="512" x2="670.17" y2="512"/>
+  <line class="cls-2" x1="243.39" y1="204.5" x2="491.87" y2="819.5"/>
+  <path class="cls-4" d="M840.8,505.96l-165.34-131.27c-5.05-4.01-12.5-.41-12.5,6.04v262.54c0,6.45,7.45,10.05,12.5,6.04l165.34-131.27c3.89-3.09,3.89-8.99,0-12.07Z"/>
+</svg>
