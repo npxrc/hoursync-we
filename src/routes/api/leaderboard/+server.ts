@@ -1,8 +1,6 @@
-import axios from "axios";
-import { CookieJar } from "tough-cookie";
-import { wrapper } from "axios-cookiejar-support";
 import * as cheerio from "cheerio";
 import { type LeaderboardData, type LeaderboardStudent } from "$lib/types";
+import { fetchWithSession, upstreamUrl } from "$lib/server/upstream";
 
 export async function GET({ request, cookies }) {
 	const startTime = Date.now();
@@ -19,11 +17,11 @@ export async function GET({ request, cookies }) {
 		`[/api/leaderboard/] Received request for session: ${sessionId}`
 	);
 
-	const httpClient = CreateHttpClient(sessionId);
-	var response = await httpClient.get(
-		"https://academyendorsement.olatheschools.com/Student/leaderBoard.php"
+	const response = await fetchWithSession(
+		sessionId,
+		upstreamUrl("/Student/leaderBoard.php")
 	);
-	var data = response.data;
+	const data = await response.text();
 
 	const $ = cheerio.load(data);
 	// find the titleNode and figure out if it contains ehour
@@ -69,24 +67,6 @@ export async function GET({ request, cookies }) {
 
 export async function POST() {
 	return new Response(null, { status: 405 });
-}
-
-function CreateHttpClient(sessionId: string) {
-	const jar = new CookieJar();
-
-	jar.setCookieSync(
-		`PHPSESSID=${sessionId}; Path=/; HttpOnly; Secure; SameSite=Lax`,
-		"https://academyendorsement.olatheschools.com"
-	);
-
-	const httpClient = wrapper(
-		axios.create({
-			jar,
-			withCredentials: true,
-		})
-	);
-
-	return httpClient;
 }
 
 function decodeHTMLEntities(text: string): string {

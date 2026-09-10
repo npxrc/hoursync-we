@@ -1,9 +1,7 @@
-import axios from "axios";
-import { CookieJar } from "tough-cookie";
-import { wrapper } from "axios-cookiejar-support";
 import * as cheerio from "cheerio";
 import type { RequestHandler } from "./$types";
 import type { FetchedEHourRequest } from "$lib/types.js";
+import { fetchWithSession } from "$lib/server/upstream";
 
 const BASE_URL = "https://academyendorsement.olatheschools.com";
 const REQUEST_URL = `${BASE_URL}/Student/eHourDescription.php`;
@@ -41,24 +39,20 @@ export const GET: RequestHandler = async ({ cookies, params }) => {
 	);
 
 	try {
-		const httpClient = CreateHttpClient(sessionId);
 		const formData = new URLSearchParams();
 		formData.set("ehours_request_descr", requestId);
 
-		const response = await httpClient.post(REQUEST_URL, formData, {
-			responseType: "arraybuffer",
-
+		const response = await fetchWithSession(sessionId, REQUEST_URL, {
+			method: "POST",
 			headers: {
 				"Content-Type": "application/x-www-form-urlencoded",
 			},
-
-			validateStatus: () => true,
+			body: formData.toString(),
 		});
 
 		const responseText = decodeResponse(
-			response.data,
-			//@ts-ignore
-			response.headers["content-type"]
+			await response.arrayBuffer(),
+			response.headers.get("content-type") ?? undefined
 		);
 
 		if (!responseText.includes("Requested Number of Hours")) {
@@ -152,25 +146,7 @@ export const GET: RequestHandler = async ({ cookies, params }) => {
 	}
 };
 
-function CreateHttpClient(sessionId: string) {
-	const jar = new CookieJar();
-
-	jar.setCookieSync(
-		`PHPSESSID=${sessionId}; Path=/; HttpOnly; Secure; SameSite=Lax`,
-		BASE_URL
-	);
-
-	return wrapper(
-		axios.create({
-			jar,
-			withCredentials: true,
-		})
-	);
-}
-
 function decodeResponse(data: ArrayBuffer, contentType?: string): string {
-	const buffer = Buffer.from(data);
-
 	const charsetMatch = contentType?.match(/charset\s*=\s*["']?([^;"'\s]+)/i);
 
 	const charset = charsetMatch?.[1]?.toLowerCase() ?? "utf-8";
@@ -189,7 +165,7 @@ function decodeResponse(data: ArrayBuffer, contentType?: string): string {
 			break;
 	}
 
-	return new TextDecoder(encoding).decode(buffer);
+	return new TextDecoder(encoding).decode(data);
 }
 
 function parseRequestedHours(text: string): string {

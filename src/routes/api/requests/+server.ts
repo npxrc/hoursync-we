@@ -1,10 +1,8 @@
-import axios from "axios";
-import { CookieJar } from "tough-cookie";
-import { wrapper } from "axios-cookiejar-support";
 import * as cheerio from "cheerio";
 import ParseHtmlToRequestList from "../parseHtmlToRequestList.js";
 import type { D1Database } from "@cloudflare/workers-types";
 import type { EHourRequest, EHourRequestList } from "$lib/types.js";
+import { fetchWithSession, upstreamUrl } from "$lib/server/upstream";
 
 export async function GET({ request, platform, cookies }) {
 	const startTime = Date.now();
@@ -19,11 +17,11 @@ export async function GET({ request, platform, cookies }) {
 
 	console.debug("[/api/requests/] Received request for session:", sessionId);
 
-	const httpClient = CreateHttpClient(sessionId);
-	var response = await httpClient.get(
-		"https://academyendorsement.olatheschools.com/Student/studentEHours.php"
+	const response = await fetchWithSession(
+		sessionId,
+		upstreamUrl("/Student/studentEHours.php")
 	);
-	var data = response.data;
+	const data = await response.text();
 
 	const $ = cheerio.load(data);
 	const table = $("table#eHourRequests").first();
@@ -258,20 +256,3 @@ function diffRequests(
 	return changes;
 }
 
-function CreateHttpClient(sessionId: string) {
-	const jar = new CookieJar();
-
-	jar.setCookieSync(
-		`PHPSESSID=${sessionId}; Path=/; HttpOnly; Secure; SameSite=Lax`,
-		"https://academyendorsement.olatheschools.com"
-	);
-
-	const httpClient = wrapper(
-		axios.create({
-			jar,
-			withCredentials: true,
-		})
-	);
-
-	return httpClient;
-}

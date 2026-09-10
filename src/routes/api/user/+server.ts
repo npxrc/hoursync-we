@@ -1,8 +1,6 @@
-import axios from "axios";
-import { CookieJar } from "tough-cookie";
-import { wrapper } from "axios-cookiejar-support";
 import * as cheerio from "cheerio";
 import ParseHtmlToRequestList from "../parseHtmlToRequestList.js";
+import { fetchWithSession, upstreamUrl } from "$lib/server/upstream";
 
 export async function GET({ request, cookies }) {
 	const startTime = performance.now();
@@ -16,20 +14,21 @@ export async function GET({ request, cookies }) {
 	}
 
 	console.debug(`[/api/user/] Received request for session: ${sessionId}`);
-	const httpClient = CreateHttpClient(sessionId);
-	var response = await httpClient.get(
-		"https://academyendorsement.olatheschools.com/Student/studentHome.php"
+	const response = await fetchWithSession(
+		sessionId,
+		upstreamUrl("/Student/studentHome.php")
 	);
-	var data = response.data;
+	const data = await response.text();
 	const $ = cheerio.load(data);
 
 	const academy = ExtractBetween(data, ">Welcome to your", " Endorsement");
 	const name = ExtractBetween(data, "Tracking, ", "</");
 
-	const eHoursPage = await httpClient.get(
-		"https://academyendorsement.olatheschools.com/Student/studentEHours.php"
+	const eHoursPage = await fetchWithSession(
+		sessionId,
+		upstreamUrl("/Student/studentEHours.php")
 	);
-	const eHoursData = eHoursPage.data;
+	const eHoursData = await eHoursPage.text();
 	const $eHours = cheerio.load(eHoursData);
 
 	var eHoursCount: string =
@@ -103,22 +102,6 @@ export async function GET({ request, cookies }) {
 			studentId,
 		}),
 		{ status: 200, headers: { "Content-Type": "application/json" } }
-	);
-}
-
-function CreateHttpClient(sessionId: string) {
-	const jar = new CookieJar();
-
-	jar.setCookieSync(
-		`PHPSESSID=${sessionId}; Path=/; HttpOnly; Secure; SameSite=Lax`,
-		"https://academyendorsement.olatheschools.com"
-	);
-
-	return wrapper(
-		axios.create({
-			jar,
-			withCredentials: true,
-		})
 	);
 }
 

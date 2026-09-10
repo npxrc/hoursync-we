@@ -1,6 +1,4 @@
-import { CookieJar } from "tough-cookie";
-import { wrapper } from "axios-cookiejar-support";
-import axios from "axios";
+import { fetchWithSession, upstreamUrl } from "$lib/server/upstream";
 
 export async function GET() {
 	return new Response(null, { status: 405 });
@@ -39,16 +37,16 @@ export async function POST({ request }) {
 		`[/api/activeSession/] Received request for session: ${sessionId}`
 	);
 
-	const httpClient = CreateHttpClient(sessionId);
-	// @ts-ignore
-	const res = await httpClient.get(
-		"https://academyendorsement.olatheschools.com/Student/studentHome.php"
+	const res = await fetchWithSession(
+		sessionId,
+		upstreamUrl("/Student/studentHome.php")
 	);
+	const responseText = await res.text();
 
 	const endTime = Date.now();
 	const elapsed = endTime - startTime;
 
-	if (typeof res.data === "string" && res.data.includes("Welcome to your")) {
+	if (responseText.includes("Welcome to your")) {
 		return new Response(JSON.stringify({ active: true, elapsed }), {
 			status: 200,
 		});
@@ -57,21 +55,4 @@ export async function POST({ request }) {
 			status: 200,
 		});
 	}
-}
-function CreateHttpClient(sessionId: string) {
-	const jar = new CookieJar();
-
-	jar.setCookieSync(
-		`PHPSESSID=${sessionId}; Path=/; HttpOnly; Secure; SameSite=Lax`,
-		"https://academyendorsement.olatheschools.com"
-	);
-
-	const httpClient = wrapper(
-		axios.create({
-			jar,
-			withCredentials: true,
-		})
-	);
-
-	return httpClient;
 }
