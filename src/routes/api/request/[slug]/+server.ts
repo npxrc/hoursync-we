@@ -65,7 +65,7 @@ export const GET: RequestHandler = async ({ cookies, params }) => {
 				Images: [],
 				Success: false,
 				LoggedIn: false,
-				Error: "Not logged in.",
+				Error: "Not logged in or invalid request ID",
 				Html: responseText,
 			};
 
@@ -215,7 +215,8 @@ function fixMojibake(text: string | null): string {
 				.replaceAll("â€œ", '"')
 				.replaceAll("â€\u009d", '"')
 				.replaceAll('â€"', "–")
-				.replaceAll("â€”", "—");
+				.replaceAll("â€”", "—")
+				.replaceAll("\r", "\n");
 }
 
 function jsonResponse(data: unknown, status = 200): Response {

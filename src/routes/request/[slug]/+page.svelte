@@ -5,7 +5,7 @@
 
 	const { data } = $props();
 	let title = $state("");
-	let status = $state(0);
+	let status = $state(convertStatusToString(Status.Pending));
 	let loaded = $state(false);
 	onMount(() => {
 		const requestId = data.request?.Value;
@@ -14,10 +14,56 @@
 		if (requestId) {
 			const requestDescription = localStorage.getItem(requestId);
 			if (requestDescription) {
+				console.log(
+					"Found request description in localStorage:",
+					requestDescription
+				);
 				var requestData = JSON.parse(requestDescription);
 				title = requestData.body;
 				status = requestData.state;
 				loaded = true;
+			} else {
+				// fetch from server
+				console.log(
+					"Request description not found in localStorage, fetching from server..."
+				);
+				fetch("/api/requests")
+					.then((response) => response.json())
+					.then((requests) => {
+						const request = [
+							...requests.requests.Accepted,
+							...requests.requests.Denied,
+							...requests.requests.Pending,
+							...requests.requests.Returned,
+						].find((r: any) => r.Value === requestId);
+						if (request) {
+							console.log(
+								"Found request in server response:",
+								request
+							);
+							title = request.Description;
+
+							status = convertStatusToString(request.State);
+							loaded = true;
+							localStorage.setItem(
+								requestId,
+								JSON.stringify({ body: title, state: status })
+							);
+						} else {
+							console.warn(
+								"Request not found in server response:",
+								requests,
+								requestId
+							);
+							title = requestId;
+							status = convertStatusToString(Status.Pending);
+							loaded = true;
+						}
+					})
+					.catch((error) => {
+						console.error("Error fetching requests:", error);
+						goto("/home");
+					});
 			}
 		}
 	});
@@ -49,6 +95,20 @@
 			})
 		);
 	}
+	function convertStatusToString(status: any): string {
+		switch (status) {
+			case Status.Accepted:
+				return "Accepted";
+			case Status.Pending:
+				return "Pending";
+			case Status.Denied:
+				return "Denied";
+			case Status.Returned:
+				return "Returned";
+			default:
+				return "Unknown";
+		}
+	}
 
 	function relativeDate(dateString: string): string {
 		// hours ago, days ago, months ago, years ago, whichever is most appropriate
@@ -63,14 +123,22 @@
 		if (diffHours < 1) {
 			return "Just now";
 		} else if (diffHours < 24) {
-			return `${diffHours} hours ago`;
+			return `${diffHours} hour${addS(diffHours)} ago`;
 		} else if (diffDays < 30) {
-			return `${diffDays} days ago`;
+			return `${diffDays} day${addS(diffDays)} ago`;
 		} else if (diffMonths < 12) {
-			return `${diffMonths} months ago`;
+			return `${diffMonths} month${addS(diffMonths)} ago`;
 		} else {
-			return `${diffYears} years ago`;
+			return `${diffYears} year${addS(diffYears)} ago`;
 		}
+	}
+	function addS(num: number): string {
+		return num == 1 ? "" : "s";
+	}
+
+	function copyRequest() {
+		let url = `/submit?createTemplate=true&title=${encodeURIComponent(title)}&hours=${encodeURIComponent(data.request?.RequestedHours || "")}&description=${encodeURIComponent(data.request?.Body || "")}`;
+		goto(url);
 	}
 </script>
 
@@ -91,22 +159,30 @@
 					)})
 				</p>
 				<p>Requested Hours: {data.request.RequestedHours}</p>
-				<p>Attached Images: {data.request.Images.length}</p>
+				<p>
+					Attached Images: {data.request.Images.length == 0
+						? "None"
+						: data.request.Images.length}
+				</p>
 			</div>
 			<div class="left-card quick-actions">
 				<b class="head">Quick Actions</b>
 				<p>
 					<button onclick={() => goto("/home")}>Back to Home</button>
 				</p>
-				<p><button disabled>Copy Request</button></p>
+				<p><button onclick={copyRequest}>Copy Request</button></p>
 				<p>
-					<button disabled={status != Status.Pending}
-						>Edit Request</button
+					<button
+						// disabled={status !=
+						// 	convertStatusToString(Status.Pending)}
+						disabled>Edit Request</button
 					>
 				</p>
 				<p>
-					<button disabled={status != Status.Pending}
-						>Delete Request</button
+					<button
+						// disabled={status !=
+						// 	convertStatusToString(Status.Pending)}
+						disabled>Delete Request</button
 					>
 				</p>
 			</div>
@@ -221,8 +297,11 @@
 		margin-top: 0.25rem;
 		width: 100%;
 		text-align: left;
+		transition: all 250ms ease;
 	}
-
+	.quick-actions button:hover {
+		background: rgba(255, 255, 255, 0.07);
+	}
 	.quick-actions button:disabled {
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.1);

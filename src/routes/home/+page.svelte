@@ -129,6 +129,19 @@
 		studentAcademy = localStorage.getItem("userData")
 			? JSON.parse(localStorage.getItem("userData") || "{}").academy
 			: "";
+
+		if (!studentName || !studentAcademy) {
+			console.warn(
+				"Student name or academy not found in localStorage. Fetching from server..."
+			);
+			fetch("/api/whoami")
+				.then((response) => response.json())
+				.then((userData) => {
+					studentName = userData.name;
+					studentAcademy = userData.academy;
+					localStorage.setItem("userData", JSON.stringify(userData));
+				});
+		}
 		const eHoursData = data.html;
 		const eHourHtml = cheerio.load(eHoursData);
 
@@ -225,7 +238,9 @@
 		};
 	});
 
+	let reloadActive = $state(false);
 	function reloadRequests() {
+		reloadActive = true;
 		fetch("/api/requests", {
 			method: "GET",
 		})
@@ -236,6 +251,7 @@
 					html: newData.html as string,
 					changes: newData.changes as any,
 				};
+				reloadActive = false;
 			})
 			.catch((error) => {
 				console.error("Error reloading requests:", error);
@@ -256,7 +272,7 @@
 			<section class="left-card quick-actions">
 				<b class="head">Quick Actions</b>
 				<p><button onclick={toSubmit}>Submit Request</button></p>
-				<p><button onclick={toLeaderboard}>To Leaderboard</button></p>
+				<p><button onclick={toLeaderboard}>Leaderboard</button></p>
 				<p><button onclick={signOut}>Sign Out</button></p>
 			</section>
 			<section class="left-card recent-changes">
@@ -297,6 +313,13 @@
 				<progress value={progressTo200Hrs} max="100"></progress>
 			</section>
 		</div>
+		<div class="versionInfo">
+			<a
+				href="https://github.com/npxrc/hoursync-we"
+				target="_blank"
+				rel="noopener noreferrer">Version: 1.0.1</a
+			>
+		</div>
 	</div>
 	<div id="right">
 		<div class="top-controls">
@@ -322,14 +345,19 @@
 				<option value="titleZA">Title (Z-A)</option>
 			</select>
 
-			<button onclick={reloadRequests}>Reload</button>
+			<button
+				class="reload-button"
+				onclick={reloadRequests}
+				disabled={reloadActive}
+			>
+				Reload{reloadActive ? "ing..." : ""}
+			</button>
 		</div>
 		{#each getStatuses(filteredRequests) as status}
 			<h2>{status} ({filteredRequests[status].length})</h2>
 			<ul>
 				{#each filteredRequests[status] as request}
-					<a
-						href={`#${request.Value}`}
+					<button
 						onclick={() =>
 							toRequest(
 								request.Value,
@@ -344,21 +372,17 @@
 									request.State
 								);
 						}}
-						role="button"
 						tabindex="0"
 					>
-						<li id={request.Value}>
-							<p>
-								{request.Description}<br />
-								{dateToReadable(request.Date)}<br />
-								{request.Hours} eHour{parseFloat(
-									request.Hours
-								) !== 1
-									? "s"
-									: ""}
-							</p>
-						</li>
-					</a>
+						<p>
+							{request.Description}<br />
+							{dateToReadable(request.Date)}<br />
+							{request.Hours} eHour{parseFloat(request.Hours) !==
+							1
+								? "s"
+								: ""}
+						</p>
+					</button>
 				{/each}
 			</ul>
 		{/each}
@@ -413,9 +437,14 @@
 		font-style: italic;
 		font-weight: 400;
 	}
-	a {
-		text-decoration: none;
-		color: inherit;
+
+	#left .versionInfo {
+		width: 100%;
+		text-align: center;
+	}
+	.versionInfo a {
+		color: rgba(255, 255, 255, 0.7);
+		text-decoration: underline;
 	}
 
 	.left-card {
@@ -456,6 +485,10 @@
 		margin-top: 0.25rem;
 		width: 100%;
 		text-align: left;
+		transition: all 250ms ease;
+	}
+	.quick-actions button:hover {
+		background: rgba(255, 255, 255, 0.07);
 	}
 
 	.top-controls {
@@ -477,8 +510,11 @@
 		padding: 0;
 		margin: 0;
 	}
-
-	#right li {
+	#right button {
+		display: block;
+		width: 100%;
+		color: white;
+		text-align: left;
 		background: rgba(255, 255, 255, 0.08);
 		border: 1px solid rgba(255, 255, 255, 0.2);
 		padding: 0.1rem 1rem;
@@ -486,6 +522,26 @@
 		margin-bottom: 0.5rem;
 		font-weight: 500;
 		box-sizing: border-box;
+
+		cursor: pointer;
+	}
+
+	button.reload-button {
+		background: rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		color: white;
+		padding: 0.5rem 1rem;
+		border-radius: 5px;
+		cursor: pointer;
+		font-weight: 500;
+		margin-bottom: 0 !important;
+		height: auto;
+		text-align: center;
+	}
+
+	button.reload-button[disabled] {
+		opacity: 0.7;
+		cursor: not-allowed;
 	}
 
 	@media screen and (max-width: 1200px) {

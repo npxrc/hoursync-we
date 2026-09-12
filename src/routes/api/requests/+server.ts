@@ -5,6 +5,7 @@ import type { EHourRequest, EHourRequestList } from "$lib/types.js";
 import { fetchWithSession, upstreamUrl } from "$lib/server/upstream";
 
 export async function GET({ request, platform, cookies }) {
+	// return new Response(null, { status: 405 }); // testing
 	const startTime = Date.now();
 
 	const sessionId = cookies.get("sessionId");
@@ -255,4 +256,3 @@ function diffRequests(
 
 	return changes;
 }
-

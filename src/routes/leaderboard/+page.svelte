@@ -115,6 +115,9 @@
 		}
 		return name; // Return the original name if it doesn't match the expected format
 	}
+	function compareNames(name1: string, name2: string): boolean {
+		return name1.trim() === name2.trim();
+	}
 </script>
 
 <svelte:head>
@@ -157,7 +160,7 @@
 		<ul>
 			{#each leaderboard as student}
 				<li
-					class={userLeaderName === convertStudentName(student.Name)
+					class={compareNames(student.Name, userLeaderName)
 						? "self"
 						: ""}
 				>
@@ -244,6 +247,23 @@
 		width: 100%;
 		display: block;
 	}
+	.quick-actions button {
+		background: rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		color: white;
+		padding: 0.5rem 1rem;
+		border-radius: 5px;
+		cursor: pointer;
+		font-size: 1rem;
+		font-weight: 500;
+		margin-top: 0.25rem;
+		width: 100%;
+		text-align: left;
+		transition: all 250ms ease;
+	}
+	.quick-actions button:hover {
+		background: rgba(255, 255, 255, 0.07);
+	}
 	#right ul {
 		list-style: none;
 		padding: 0;
@@ -266,20 +286,10 @@
 		text-align: left;
 		gap: 30px;
 	}
+	#right .data p {
+		margin: 6px 0;
+	}
 	li.self {
 		color: var(--gradient-4);
-	}
-	.quick-actions button {
-		background: rgba(255, 255, 255, 0.1);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		color: white;
-		padding: 0.5rem 1rem;
-		border-radius: 5px;
-		cursor: pointer;
-		font-size: 1rem;
-		font-weight: 500;
-		margin-top: 0.25rem;
-		width: 100%;
-		text-align: left;
 	}
 </style>

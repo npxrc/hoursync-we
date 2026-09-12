@@ -53,7 +53,7 @@ export async function POST({ request, cookies, platform }) {
 
 		debugTrace += line + "\n";
 
-		console.log(line);
+		// console.log(line);
 	};
 
 	trace("========== LOGIN REQUEST START ==========");

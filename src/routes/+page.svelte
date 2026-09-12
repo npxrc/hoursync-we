@@ -97,6 +97,7 @@
 				placeholder="Enter your district password"
 				required
 				bind:value={password}
+				onkeydown={login}
 			/>
 			<br /><br />
 			<button type="submit" onclick={login}>Sign In</button>
@@ -120,14 +121,6 @@
 	}
 	.grain.fine {
 		background-size: 32px;
-	}
-	#contentContainer {
-		height: 100vh;
-		width: 100vw;
-		position: absolute;
-		top: 0;
-		left: 0;
-		z-index: 5;
 	}
 	.modal {
 		height: 100%;
@@ -169,17 +162,6 @@
 	p,
 	label {
 		font-size: 1.25rem;
-	}
-	.blob {
-		position: absolute;
-		bottom: 0;
-		left: auto;
-		right: auto;
-		overflow: hidden;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 100vw;
 	}
 	.left,
 	.right {
