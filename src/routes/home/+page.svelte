@@ -20,7 +20,16 @@
 	function getStatuses(
 		requests: EHourRequestList
 	): Array<keyof EHourRequestList> {
-		return Object.keys(requests) as Array<keyof EHourRequestList>;
+		const defaultOrder: Array<keyof EHourRequestList> = [
+			"Accepted",
+			"Pending",
+			"Denied",
+			"Returned",
+		];
+
+		return requests.Pending.length > 0
+			? ["Pending", "Accepted", "Denied", "Returned"]
+			: defaultOrder;
 	}
 	function convertStatusToString(status: any): string {
 		switch (status) {
@@ -317,7 +326,7 @@
 			<a
 				href="https://github.com/npxrc/hoursync-we"
 				target="_blank"
-				rel="noopener noreferrer">Version: 1.0.1</a
+				rel="noopener noreferrer">Version: 1.0.2</a
 			>
 		</div>
 	</div>
