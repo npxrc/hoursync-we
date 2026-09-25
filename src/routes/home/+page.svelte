@@ -1,5 +1,9 @@
 <script lang="ts">
-	import { Status, type EHourRequestList } from "$lib/types.js";
+	import {
+		Status,
+		type EHourRequest,
+		type EHourRequestList,
+	} from "$lib/types.js";
 	import { goto } from "$app/navigation";
 	import { onMount } from "svelte";
 	import ParseHtmlToRequestList from "../api/parseHtmlToRequestList";
@@ -241,7 +245,7 @@
 		const sortRequests = (
 			requests: EHourRequestList[keyof EHourRequestList]
 		) =>
-			requests
+			[...requests]
 				.filter((request) =>
 					request.Description.toLowerCase().includes(query)
 				)
@@ -298,7 +302,70 @@
 			});
 	}
 
+	type RequestGroup = {
+		description: string;
+		requests: EHourRequest[];
+		totalHours: number;
+		latestDate: number;
+	};
+
+	function findGroups(
+		requests: EHourRequest[],
+		sortDirection: string
+	): RequestGroup[] {
+		// use the same regex from the c# app
+		// var regex = new System.Text.RegularExpressions.Regex(@"(?i)\s*(?:\[\d+\]|(?:Submission|Part|Pt\.?|Request)\s*\d+|\d{1,2}/\d{1,2}|\d+)\s*$");
+		const regex =
+			/\s*(?:\[\d+\]|(?:Submission|Part|Pt\.?|Request)\s*\d+|\d{1,2}\/\d{1,2}|\d+)\s*$/i;
+		const groups = new Map<string, EHourRequest[]>();
+
+		for (const request of requests) {
+			const baseDescription = request.Description.replace(
+				regex,
+				""
+			).trim();
+			const group = groups.get(baseDescription) ?? [];
+			group.push(request);
+			groups.set(baseDescription, group);
+		}
+
+		return [...groups.entries()]
+			.map(([description, groupedRequests]) => ({
+				description,
+				requests: groupedRequests,
+				totalHours: groupedRequests.reduce(
+					(total, request) =>
+						total + (parseFloat(request.Hours) || 0),
+					0
+				),
+				latestDate: Math.max(
+					...groupedRequests.map((request) =>
+						new Date(request.Date).getTime()
+					)
+				),
+			}))
+			.sort((a, b) => {
+				switch (sortDirection) {
+					case "dateNewOld":
+						return b.latestDate - a.latestDate;
+					case "dateOldNew":
+						return a.latestDate - b.latestDate;
+					case "hoursHighLow":
+						return b.totalHours - a.totalHours;
+					case "hoursLowHigh":
+						return a.totalHours - b.totalHours;
+					case "titleAZ":
+						return a.description.localeCompare(b.description);
+					case "titleZA":
+						return b.description.localeCompare(a.description);
+					default:
+						return 0;
+				}
+			});
+	}
+
 	import type { Snippet } from "svelte";
+	import GroupRequest from "./GroupRequest.svelte";
 
 	type Card = {
 		head: string;
@@ -338,7 +405,7 @@
 			titleOptions={{ italic: true, rawHtml: true }}
 			cards={navbarCards}
 			quickActions={navbarQuickActions}
-			version="1.0.2"
+			version="1.0.3"
 		>
 			<section class="left-card recent-changes">
 				<b class="head">Recent Changes</b>
@@ -402,36 +469,12 @@
 		</div>
 		{#each getStatuses(filteredRequests) as status}
 			<h2>{status} ({filteredRequests[status].length})</h2>
-			<ul>
-				{#each filteredRequests[status] as request}
-					<button
-						onclick={() =>
-							toRequest(
-								request.Value,
-								request.Description,
-								request.State
-							)}
-						onkeyup={(e) => {
-							if (e.key === "Enter")
-								toRequest(
-									request.Value,
-									request.Description,
-									request.State
-								);
-						}}
-						tabindex="0"
-					>
-						<p>
-							{request.Description}<br />
-							{dateToReadable(request.Date)}<br />
-							{request.Hours} eHour{parseFloat(request.Hours) !==
-							1
-								? "s"
-								: ""}
-						</p>
-					</button>
-				{/each}
-			</ul>
+			{#each findGroups(filteredRequests[status], sortOption) as group (group.description)}
+				<GroupRequest
+					description={group.description}
+					requests={group.requests}
+				/>
+			{/each}
 		{/each}
 	</div>
 </div>
@@ -488,27 +531,6 @@
 		border: 1px solid rgba(255, 255, 255, 0.2);
 		background-color: rgba(255, 255, 255, 0.1);
 		color: white;
-	}
-
-	#right ul {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-	}
-	#right button {
-		display: block;
-		width: 100%;
-		color: white;
-		text-align: left;
-		background: rgba(255, 255, 255, 0.08);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		padding: 0.1rem 1rem;
-		border-radius: 8px;
-		margin-bottom: 0.5rem;
-		font-weight: 500;
-		box-sizing: border-box;
-
-		cursor: pointer;
 	}
 
 	button.reload-button {

@@ -38,46 +38,44 @@
 	}: Props = $props();
 </script>
 
-<div id="left">
-	<h1 class="serif {titleOptions.italic ? 'italic' : ''}">
-		{#if titleOptions.rawHtml}
-			{@html title}
-		{:else}
-			{title}
-		{/if}
-	</h1>
-	<div class="cards">
-		<section class="left-card quick-actions">
-			<b class="head">Quick Actions</b>
-			{#each quickActions as action}
-				<button onclick={action.onclick} disabled={action.disabled}>
-					{action.label}
-				</button>
-			{/each}
-		</section>
-		{@render children?.()}
-		{#each cards as card}
-			<section class="left-card">
-				<div class="head">{card.head}</div>
-				{#if card.rawHtml}
-					{@html card.content}
-				{:else}
-					<p>{card.content}</p>
-				{/if}
-			</section>
-		{/each}
-	</div>
-
-	{#if version}
-		<div class="versionInfo">
-			<a
-				href="https://github.com/npxrc/hoursync-we"
-				target="_blank"
-				rel="noopener noreferrer">Version: {version}</a
-			>
-		</div>
+<h1 class="serif {titleOptions.italic ? 'italic' : ''}">
+	{#if titleOptions.rawHtml}
+		{@html title}
+	{:else}
+		{title}
 	{/if}
+</h1>
+<div class="cards">
+	<section class="left-card quick-actions">
+		<b class="head">Quick Actions</b>
+		{#each quickActions as action}
+			<button onclick={action.onclick} disabled={action.disabled}>
+				{action.label}
+			</button>
+		{/each}
+	</section>
+	{@render children?.()}
+	{#each cards as card}
+		<section class="left-card">
+			<div class="head">{card.head}</div>
+			{#if card.rawHtml}
+				{@html card.content}
+			{:else}
+				<p>{card.content}</p>
+			{/if}
+		</section>
+	{/each}
 </div>
+
+{#if version}
+	<div class="versionInfo">
+		<a
+			href="https://github.com/npxrc/hoursync-we"
+			target="_blank"
+			rel="noopener noreferrer">Version: {version}</a
+		>
+	</div>
+{/if}
 
 <style>
 	h1 {
