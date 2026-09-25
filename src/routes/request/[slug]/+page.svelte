@@ -2,6 +2,7 @@
 	import { onMount } from "svelte";
 	import { goto } from "$app/navigation";
 	import { Status } from "$lib/types.js";
+	import Navbar from "../../Navbar.svelte";
 
 	const { data } = $props();
 	let title = $state("");
@@ -148,45 +149,34 @@
 
 <div id="app">
 	<div id="left">
-		<h1 class="serif italic">{title || "Loading Request..."}</h1>
-		{#if loaded}
-			<div class="left-card about-this-request">
-				<b class="head">About This Request</b>
-				<p>Status: {status}</p>
-				<p>
-					Submitted on {dateToReadable(data.request?.Date || "")} ({relativeDate(
-						data.request.Date || ""
-					)})
-				</p>
-				<p>Requested Hours: {data.request.RequestedHours}</p>
-				<p>
-					Attached Images: {data.request.Images.length == 0
-						? "None"
-						: data.request.Images.length}
-				</p>
-			</div>
-			<div class="left-card quick-actions">
-				<b class="head">Quick Actions</b>
-				<p>
-					<button onclick={() => goto("/home")}>Back to Home</button>
-				</p>
-				<p><button onclick={copyRequest}>Copy Request</button></p>
-				<p>
-					<button
-						// disabled={status !=
-						// 	convertStatusToString(Status.Pending)}
-						disabled>Edit Request</button
-					>
-				</p>
-				<p>
-					<button
-						// disabled={status !=
-						// 	convertStatusToString(Status.Pending)}
-						disabled>Delete Request</button
-					>
-				</p>
-			</div>
-		{/if}
+		<Navbar
+			title={title || "Loading Request..."}
+			titleOptions={{ italic: true, rawHtml: false }}
+			quickActions={[
+				{ label: "Back to Home", onclick: () => goto("/home") },
+				{ label: "Copy Request", onclick: copyRequest },
+				{ label: "Edit Request", onclick: () => {}, disabled: true },
+				{ label: "Delete Request", onclick: () => {}, disabled: true },
+			]}
+		>
+			{#if loaded}
+				<section class="left-card about-this-request">
+					<b class="head">About This Request</b>
+					<p>Status: {status}</p>
+					<p>
+						Submitted on {dateToReadable(data.request?.Date || "")} ({relativeDate(
+							data.request.Date || ""
+						)})
+					</p>
+					<p>Requested Hours: {data.request.RequestedHours}</p>
+					<p>
+						Attached Images: {data.request.Images.length == 0
+							? "None"
+							: data.request.Images.length}
+					</p>
+				</section>
+			{/if}
+		</Navbar>
 	</div>
 	<div id="right">
 		{#if data.request}
@@ -246,67 +236,9 @@
 		background: rgba(255, 255, 255, 0.08);
 		border-radius: 0 20px 20px 0;
 	}
-	h1 {
-		font-size: 4rem;
-		margin: 0.5rem 0 1.3rem 0;
-	}
 	h2 {
 		font-size: 2.5rem;
 		margin: 0.5rem 0 1.3rem 0;
-	}
-	.serif {
-		font-family: "Instrument Serif", serif;
-	}
-	.serif.italic {
-		font-style: italic;
-		font-weight: 400;
-	}
-
-	.left-card {
-		background: rgba(255, 255, 255, 0.08);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		padding: 1rem;
-		padding-right: 2rem;
-		border-radius: 8px;
-		margin-bottom: 1rem;
-		margin-left: -10px;
-		font-weight: 500;
-		box-sizing: border-box;
-	}
-	.left-card .head {
-		font-size: 1.5rem;
-		font-weight: 700;
-		margin-bottom: 0.3rem;
-		padding-bottom: 0.2rem;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-		width: 100%;
-		display: block;
-	}
-	.left-card p {
-		margin: 0.5rem 0;
-	}
-	.quick-actions button {
-		background: rgba(255, 255, 255, 0.1);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		color: white;
-		padding: 0.5rem 1rem;
-		border-radius: 5px;
-		cursor: pointer;
-		font-size: 1rem;
-		font-weight: 500;
-		margin-top: 0.25rem;
-		width: 100%;
-		text-align: left;
-		transition: all 250ms ease;
-	}
-	.quick-actions button:hover {
-		background: rgba(255, 255, 255, 0.07);
-	}
-	.quick-actions button:disabled {
-		background: rgba(255, 255, 255, 0.05);
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		color: rgba(255, 255, 255, 0.5);
-		cursor: not-allowed;
 	}
 
 	#right .images img {
@@ -333,9 +265,6 @@
 		#left {
 			display: grid;
 			grid-template-columns: 1fr 2fr;
-		}
-		#left h1 {
-			width: 90%;
 		}
 		.left-card {
 			margin-left: 0;

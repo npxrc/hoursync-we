@@ -4,6 +4,7 @@
 	import { onMount } from "svelte";
 	import ParseHtmlToRequestList from "../api/parseHtmlToRequestList";
 	import * as cheerio from "cheerio";
+	import Navbar from "../Navbar.svelte";
 
 	let {
 		data,
@@ -194,6 +195,36 @@
 		} else {
 			localStorage.setItem("sortDirection", sortOption);
 		}
+
+		navbarCards = [
+			{
+				head: "Statistics",
+				content: `
+					<p>Accepted Hours: ${acceptedHours}</p>
+					<p>Pending Hours: ${pendingHours}</p>
+					<p>Acceptance Rate: ${acceptRate}% (${acceptedHours}/${
+						acceptedHours + deniedHours
+					})</p>
+					<p>Progress to endorsement: ${progressTo200Hrs}%</p>
+					<progress value="${progressTo200Hrs}" max="100"></progress>
+				`,
+				rawHtml: true,
+			},
+		];
+		navbarQuickActions = [
+			{
+				label: "Submit Request",
+				onclick: toSubmit,
+			},
+			{
+				label: "Leaderboard",
+				onclick: toLeaderboard,
+			},
+			{
+				label: "Sign Out",
+				onclick: signOut,
+			},
+		];
 	});
 	let searchTerm = $state("");
 	let sortOption = $state("dateNewOld");
@@ -266,6 +297,34 @@
 				console.error("Error reloading requests:", error);
 			});
 	}
+
+	import type { Snippet } from "svelte";
+
+	type Card = {
+		head: string;
+		content: string;
+		rawHtml: boolean;
+	};
+
+	type QuickAction = {
+		label: string;
+		onclick: () => void;
+	};
+
+	type Props = {
+		title?: string;
+		titleOptions?: {
+			italic: boolean;
+			rawHtml: boolean;
+		};
+		cards?: Card[];
+		quickActions?: QuickAction[];
+		version?: string | null;
+		children?: Snippet;
+	};
+
+	let navbarCards: Card[] = $state([]);
+	let navbarQuickActions: QuickAction[] = $state([]);
 </script>
 
 <svelte:head>
@@ -274,16 +333,13 @@
 
 <div id="app">
 	<div id="left">
-		<h1 class="serif italic">
-			{greeting},<br /><b>{studentName.split(" ")[0]}</b>
-		</h1>
-		<div class="cards">
-			<section class="left-card quick-actions">
-				<b class="head">Quick Actions</b>
-				<p><button onclick={toSubmit}>Submit Request</button></p>
-				<p><button onclick={toLeaderboard}>Leaderboard</button></p>
-				<p><button onclick={signOut}>Sign Out</button></p>
-			</section>
+		<Navbar
+			title={`${greeting},<br /><b class="greeting-name">${studentName.split(" ")[0]}</b>`}
+			titleOptions={{ italic: true, rawHtml: true }}
+			cards={navbarCards}
+			quickActions={navbarQuickActions}
+			version="1.0.2"
+		>
 			<section class="left-card recent-changes">
 				<b class="head">Recent Changes</b>
 				{#if data.changes?.length}
@@ -310,25 +366,7 @@
 					<p>No recent changes.</p>
 				{/if}
 			</section>
-			<section class="left-card stats">
-				<b class="head">Statistics</b>
-				<p>Accepted Hours: {acceptedHours}</p>
-				<p>Pending Hours: {pendingHours}</p>
-				<p>
-					Acceptance Rate: {acceptRate}% ({acceptedHours}/{acceptedHours +
-						deniedHours})
-				</p>
-				<p>Progress to endorsement: {progressTo200Hrs}%</p>
-				<progress value={progressTo200Hrs} max="100"></progress>
-			</section>
-		</div>
-		<div class="versionInfo">
-			<a
-				href="https://github.com/npxrc/hoursync-we"
-				target="_blank"
-				rel="noopener noreferrer">Version: 1.0.2</a
-			>
-		</div>
+		</Navbar>
 	</div>
 	<div id="right">
 		<div class="top-controls">
@@ -430,74 +468,12 @@
 		background: rgba(255, 255, 255, 0.08);
 		border-radius: 0 20px 20px 0;
 	}
-	h1 {
-		font-size: 4rem;
-		margin: 0.5rem 0 1.3rem 0;
-	}
-	h1.serif.italic b {
-		font-family: "Instrument Serif";
-		font-style: italic;
-		font-weight: 1000;
-	}
-	.serif {
+
+	:global(h1),
+	:global(h1 .greeting-name) {
 		font-family: "Instrument Serif", serif;
-	}
-	.serif.italic {
-		font-style: italic;
-		font-weight: 400;
-	}
-
-	#left .versionInfo {
-		width: 100%;
-		text-align: center;
-	}
-	.versionInfo a {
-		color: rgba(255, 255, 255, 0.7);
-		text-decoration: underline;
-	}
-
-	.left-card {
-		background: rgba(255, 255, 255, 0.08);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		padding: 1rem;
-		padding-right: 2rem;
-		border-radius: 8px;
-		margin-bottom: 1rem;
-		margin-left: -10px;
-		font-weight: 500;
-		box-sizing: border-box;
-	}
-	.left-card .head {
-		font-size: 1.5rem;
 		font-weight: 700;
-		margin-bottom: 0.3rem;
-		padding-bottom: 0.2rem;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-		width: 100%;
-		display: block;
-	}
-	.left-card p {
-		margin: 0.5rem 0;
-	}
-	.left-card progress {
-		width: 100%;
-	}
-	.quick-actions button {
-		background: rgba(255, 255, 255, 0.1);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		color: white;
-		padding: 0.5rem 1rem;
-		border-radius: 5px;
-		cursor: pointer;
-		font-size: 1rem;
-		font-weight: 500;
-		margin-top: 0.25rem;
-		width: 100%;
-		text-align: left;
-		transition: all 250ms ease;
-	}
-	.quick-actions button:hover {
-		background: rgba(255, 255, 255, 0.07);
+		font-style: italic;
 	}
 
 	.top-controls {
@@ -572,10 +548,10 @@
 			display: grid;
 			grid-template-columns: 1fr 2fr;
 		}
-		#left h1 {
+		#left :global(h1) {
 			width: 90%;
 		}
-		#left .cards {
+		#left :global(.cards) {
 			height: 100%;
 			width: 100%;
 			overflow: auto;
@@ -588,20 +564,6 @@
 		}
 		#right h2:first-of-type {
 			margin-top: 0;
-		}
-	}
-
-	@media screen and (max-width: 800px) {
-		#left {
-			grid-template-columns: 2fr 3fr;
-		}
-	}
-	@media screen and (max-width: 700px) {
-		#left {
-			grid-template-columns: 1fr;
-		}
-		#left .cards {
-			overflow: visible;
 		}
 	}
 </style>

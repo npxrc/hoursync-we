@@ -5,6 +5,7 @@
 	} from "$lib/types.js";
 	import { goto } from "$app/navigation";
 	import { onMount } from "svelte";
+	import Navbar from "../Navbar.svelte";
 
 	let { data }: { data: { leaderboard: LeaderboardStudent[] } } = $props();
 	let leaderboard: LeaderboardStudent[] = $state([]);
@@ -127,32 +128,30 @@
 
 <div id="app">
 	<div id="left">
-		<h1 class="serif italic">
-			Leaderboard for {studentAcademy ? "the" : ""}
-			<b>{studentAcademy || "your academy"}</b>
-		</h1>
-		{#if wasAdded}
-			<section class="left-card about-this-request">
-				<b class="head">Automatically Added</b>
-				<p>
-					Your user was not found in the leaderboard data, so HourSync
-					automatically added you so you can see your rank compared to
-					your peers. This data does not reflect what the official
-					portal shows and is meant for reference only.
-				</p>
-			</section>
-		{/if}
-		<section class="left-card quick-actions">
-			<b class="head">Quick Actions</b>
-			<p>
-				<button onclick={() => goto("/home")}>Back to Home</button>
-			</p>
-			<p>
-				<button onclick={() => goto("/submit")}
-					>Submit a new request</button
-				>
-			</p>
-		</section>
+		<Navbar
+			title={`Leaderboard for ${studentAcademy ? "the " : ""}${studentAcademy || "your academy"}`}
+			titleOptions={{ italic: true, rawHtml: false }}
+			quickActions={[
+				{ label: "Back to Home", onclick: () => goto("/home") },
+				{
+					label: "Submit a new request",
+					onclick: () => goto("/submit"),
+				},
+			]}
+		>
+			{#if wasAdded}
+				<section class="left-card about-this-request">
+					<b class="head">Automatically Added</b>
+					<p>
+						Your user was not found in the leaderboard data, so
+						HourSync automatically added you so you can see your
+						rank compared to your peers. This data does not reflect
+						what the official portal shows and is meant for
+						reference only.
+					</p>
+				</section>
+			{/if}
+		</Navbar>
 	</div>
 	<div id="right">
 		<h2>Leaderboard</h2>
@@ -210,59 +209,6 @@
 	#right {
 		background: rgba(255, 255, 255, 0.08);
 		border-radius: 0 20px 20px 0;
-	}
-	h1 {
-		font-size: 4rem;
-		margin: 0.5rem 0 1.3rem 0;
-	}
-	h1.serif.italic b {
-		font-family: "Instrument Serif";
-		font-style: italic;
-		font-weight: 1000;
-	}
-	.serif {
-		font-family: "Instrument Serif", serif;
-	}
-	.serif.italic {
-		font-style: italic;
-		font-weight: 400;
-	}
-	.left-card {
-		background: rgba(255, 255, 255, 0.08);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		padding: 1rem;
-		padding-right: 2rem;
-		border-radius: 8px;
-		margin-bottom: 1rem;
-		margin-left: -10px;
-		font-weight: 500;
-		box-sizing: border-box;
-	}
-	.left-card .head {
-		font-size: 1.5rem;
-		font-weight: 700;
-		margin-bottom: 0.3rem;
-		padding-bottom: 0.2rem;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-		width: 100%;
-		display: block;
-	}
-	.quick-actions button {
-		background: rgba(255, 255, 255, 0.1);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		color: white;
-		padding: 0.5rem 1rem;
-		border-radius: 5px;
-		cursor: pointer;
-		font-size: 1rem;
-		font-weight: 500;
-		margin-top: 0.25rem;
-		width: 100%;
-		text-align: left;
-		transition: all 250ms ease;
-	}
-	.quick-actions button:hover {
-		background: rgba(255, 255, 255, 0.07);
 	}
 	#right ul {
 		list-style: none;

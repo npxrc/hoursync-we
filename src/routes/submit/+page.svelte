@@ -3,6 +3,7 @@
 	import { onMount } from "svelte";
 	import ParseHtmlToRequestList from "../api/parseHtmlToRequestList";
 	import { goto, replaceState } from "$app/navigation";
+	import Navbar from "../Navbar.svelte";
 
 	let studentId = $state("");
 	let title = $state("");
@@ -186,31 +187,32 @@
 
 <div id="app">
 	<div id="left">
-		<h1 class="serif italic">Submit Request</h1>
-		<section class="left-card quick-actions">
-			<b class="head">Quick Actions</b>
-			<p>
-				<button onclick={() => goto("/home")}>Back to Home</button>
-			</p>
-		</section>
-		<section class="left-card">
-			<b class="head">Request Submission Guide</b>
-			<p>
-				Submitting eHours can help you gain an endorsement from your
-				academy, which will show up on your transcript.
-				<br />
-				<br />
-				Below are the recommendations for an eHour request from the district:
-				<br />
-				<span class="indent">
-					Please write a reflection on what you experienced and how
-					this activity is connected to what you are learning in your
-					Academy classes or to what happens in a professional career.
-					Use your English/Language Arts skills when writing the
-					reflection.
-				</span>
-			</p>
-		</section>
+		<Navbar
+			title="Submit Request"
+			titleOptions={{ italic: true, rawHtml: false }}
+			quickActions={[
+				{ label: "Back to Home", onclick: () => goto("/home") },
+			]}
+		>
+			<section class="left-card">
+				<b class="head">Request Submission Guide</b>
+				<p>
+					Submitting eHours can help you gain an endorsement from your
+					academy, which will show up on your transcript.
+					<br />
+					<br />
+					Below are the recommendations for an eHour request from the district:
+					<br />
+					<span class="indent">
+						Please write a reflection on what you experienced and
+						how this activity is connected to what you are learning
+						in your Academy classes or to what happens in a
+						professional career. Use your English/Language Arts
+						skills when writing the reflection.
+					</span>
+				</p>
+			</section>
+		</Navbar>
 	</div>
 	<div id="right">
 		<div class="status {error ? 'error' : success ? 'success' : ''}">
@@ -317,54 +319,6 @@
 	#right {
 		background: rgba(255, 255, 255, 0.08);
 		border-radius: 0 20px 20px 0;
-	}
-	h1 {
-		font-size: 4rem;
-		margin: 0.5rem 0 1.3rem 0;
-	}
-	.serif {
-		font-family: "Instrument Serif", serif;
-	}
-	.serif.italic {
-		font-style: italic;
-		font-weight: 400;
-	}
-	.left-card {
-		background: rgba(255, 255, 255, 0.08);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		padding: 1rem;
-		padding-right: 2rem;
-		border-radius: 8px;
-		margin-bottom: 1rem;
-		margin-left: -10px;
-		font-weight: 500;
-		box-sizing: border-box;
-	}
-	.left-card .head {
-		font-size: 1.5rem;
-		font-weight: 700;
-		margin-bottom: 0.3rem;
-		padding-bottom: 0.2rem;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-		width: 100%;
-		display: block;
-	}
-	.quick-actions button {
-		background: rgba(255, 255, 255, 0.1);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		color: white;
-		padding: 0.5rem 1rem;
-		border-radius: 5px;
-		cursor: pointer;
-		font-size: 1rem;
-		font-weight: 500;
-		margin-top: 0.25rem;
-		width: 100%;
-		text-align: left;
-		transition: all 250ms ease;
-	}
-	.quick-actions button:hover {
-		background: rgba(255, 255, 255, 0.07);
 	}
 	.indent {
 		margin-left: 1rem;
@@ -506,9 +460,6 @@
 		#left {
 			display: grid;
 			grid-template-columns: 1fr 2fr;
-		}
-		#left h1 {
-			width: 90%;
 		}
 		.left-card {
 			margin-left: 0;
