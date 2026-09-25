@@ -37,9 +37,6 @@
 		background-repeat: repeat;
 		background-size: 64px;
 	}
-	.grain.fine {
-		background-size: 32px;
-	}
 	#contentContainer {
 		height: 100vh;
 		width: 100vw;

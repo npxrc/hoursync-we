@@ -89,10 +89,6 @@
 		font-style: italic;
 		font-weight: 400;
 	}
-	#left .versionInfo {
-		width: 100%;
-		text-align: center;
-	}
 	.versionInfo a {
 		color: rgba(255, 255, 255, 0.7);
 		text-decoration: underline;
@@ -146,18 +142,5 @@
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		color: rgba(255, 255, 255, 0.5);
 		cursor: not-allowed;
-	}
-	@media screen and (max-width: 800px) {
-		#left {
-			grid-template-columns: 2fr 3fr;
-		}
-	}
-	@media screen and (max-width: 700px) {
-		#left {
-			grid-template-columns: 1fr;
-		}
-		#left .cards {
-			overflow: visible;
-		}
 	}
 </style>

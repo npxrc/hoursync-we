@@ -13,6 +13,7 @@ export async function GET({ request, platform, cookies }) {
 		console.debug("[/api/requests/] Received unauthenticated request");
 		return new Response(JSON.stringify({ error: "Missing sessionId" }), {
 			status: 400,
+			headers: { "Content-Type": "application/json" },
 		});
 	}
 

@@ -1,5 +1,4 @@
 import * as cheerio from "cheerio";
-import ParseHtmlToRequestList from "../parseHtmlToRequestList.js";
 import { fetchWithSession, upstreamUrl } from "$lib/server/upstream";
 
 export async function GET({ request, cookies }) {
@@ -7,13 +6,14 @@ export async function GET({ request, cookies }) {
 
 	const sessionId = cookies.get("sessionId");
 	if (!sessionId) {
-		console.debug(`[/api/user/] Received unauthenticated request`);
+		console.debug(`[/api/whoami/] Received unauthenticated request`);
 		return new Response(JSON.stringify({ error: "Missing sessionId" }), {
 			status: 400,
+			headers: { "Content-Type": "application/json" },
 		});
 	}
 
-	console.debug(`[/api/user/] Received request for session: ${sessionId}`);
+	console.debug(`[/api/whoami/] Received request for session: ${sessionId}`);
 	const response = await fetchWithSession(
 		sessionId,
 		upstreamUrl("/Student/studentHome.php")
