@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from "svelte";
 	import type { Snippet } from "svelte";
 
 	type Card = {
@@ -36,46 +37,103 @@
 		version = null,
 		children,
 	}: Props = $props();
+
+	let isBelow900px = $state(false);
+
+	onMount(() => {
+		const mediaQuery = window.matchMedia("(max-width: 900px)");
+		const updateViewportState = () => {
+			isBelow900px = mediaQuery.matches;
+		};
+
+		updateViewportState();
+		mediaQuery.addEventListener("change", updateViewportState);
+
+		return () =>
+			mediaQuery.removeEventListener("change", updateViewportState);
+	});
 </script>
 
-<h1 class="serif {titleOptions.italic ? 'italic' : ''}">
-	{#if titleOptions.rawHtml}
-		{@html title}
-	{:else}
-		{title}
-	{/if}
-</h1>
-<div class="cards">
-	<section class="left-card quick-actions">
-		<b class="head">Quick Actions</b>
-		{#each quickActions as action}
-			<button onclick={action.onclick} disabled={action.disabled}>
-				{action.label}
-			</button>
-		{/each}
-	</section>
-	{@render children?.()}
-	{#each cards as card}
-		<section class="left-card">
-			<div class="head">{card.head}</div>
-			{#if card.rawHtml}
-				{@html card.content}
-			{:else}
-				<p>{card.content}</p>
-			{/if}
-		</section>
-	{/each}
-</div>
+<div class="navContainer">
+	<h1 class="serif {titleOptions.italic ? 'italic' : ''}">
+		{#if titleOptions.rawHtml}
+			{@html title}
+		{:else}
+			{title}
+		{/if}
+	</h1>
+	{#if isBelow900px}
+		<details>
+			<summary>More Info</summary>
+			<div class="cards">
+				<section class="left-card quick-actions">
+					<b class="head">Quick Actions</b>
+					{#each quickActions as action}
+						<button
+							onclick={action.onclick}
+							disabled={action.disabled}
+						>
+							{action.label}
+						</button>
+					{/each}
+				</section>
+				{@render children?.()}
+				{#each cards as card}
+					<section class="left-card">
+						<div class="head">{card.head}</div>
+						{#if card.rawHtml}
+							{@html card.content}
+						{:else}
+							<p>{card.content}</p>
+						{/if}
+					</section>
+				{/each}
+			</div>
 
-{#if version}
-	<div class="versionInfo">
-		<a
-			href="https://github.com/npxrc/hoursync-we"
-			target="_blank"
-			rel="noopener noreferrer">Version: {version}</a
-		>
-	</div>
-{/if}
+			{#if version}
+				<div class="versionInfo">
+					<a
+						href="https://github.com/npxrc/hoursync-we"
+						target="_blank"
+						rel="noopener noreferrer">Version: {version}</a
+					>
+				</div>
+			{/if}
+		</details>
+	{:else}
+		<div class="cards">
+			<section class="left-card quick-actions">
+				<b class="head">Quick Actions</b>
+				{#each quickActions as action}
+					<button onclick={action.onclick} disabled={action.disabled}>
+						{action.label}
+					</button>
+				{/each}
+			</section>
+			{@render children?.()}
+			{#each cards as card}
+				<section class="left-card">
+					<div class="head">{card.head}</div>
+					{#if card.rawHtml}
+						{@html card.content}
+					{:else}
+						<p>{card.content}</p>
+					{/if}
+				</section>
+			{/each}
+		</div>
+
+		{#if version}
+			<div class="versionInfo">
+				<a
+					href="https://github.com/npxrc/hoursync-we"
+					target="_blank"
+					rel="noopener noreferrer">Version: {version}</a
+				>
+			</div>
+		{/if}
+	{/if}
+</div>
 
 <style>
 	h1 {
@@ -142,5 +200,46 @@
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		color: rgba(255, 255, 255, 0.5);
 		cursor: not-allowed;
+	}
+	details {
+		background: rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		color: white;
+		padding: 0.5rem 1rem;
+		border-radius: 5px;
+		cursor: pointer;
+		font-size: 1rem;
+		font-weight: 500;
+		box-sizing: border-box;
+		margin-top: 0.25rem;
+		width: 100%;
+	}
+	details[open] summary {
+		cursor: pointer;
+		margin-bottom: 0.5rem;
+	}
+
+	@media screen and (max-width: 1200px) {
+		.navContainer {
+			display: grid;
+			grid-template-columns: 1fr 2fr;
+		}
+		.cards {
+			flex-direction: column;
+		}
+		:global(.left-card) {
+			margin-left: 0px;
+		}
+	}
+	@media screen and (max-width: 900px) {
+		.navContainer {
+			display: block;
+		}
+		.cards {
+			flex-direction: column;
+		}
+		:global(.left-card) {
+			margin-left: 0px;
+		}
 	}
 </style>

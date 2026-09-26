@@ -551,6 +551,18 @@
 		cursor: not-allowed;
 	}
 
+	select#sort {
+		padding: 0.5rem;
+		border-radius: 5px;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		background-color: rgba(255, 255, 255, 0.1);
+		color: white;
+		cursor: pointer;
+	}
+	select#sort option {
+		color: black;
+	}
+
 	@media screen and (max-width: 1200px) {
 		#app {
 			grid-template-columns: 1fr;
@@ -566,10 +578,6 @@
 			padding: 1.5rem;
 			box-sizing: border-box;
 		}
-		#left {
-			display: grid;
-			grid-template-columns: 1fr 2fr;
-		}
 		#left :global(h1) {
 			width: 90%;
 		}
@@ -582,10 +590,33 @@
 			margin-left: 0;
 		}
 		#right {
+			padding-top: 0;
 			border-radius: 0 0 20px 20px;
 		}
 		#right h2:first-of-type {
 			margin-top: 0;
+		}
+		.top-controls {
+			margin-bottom: 10px;
+			position: sticky;
+			top: 0;
+			z-index: 10;
+			backdrop-filter: blur(5px);
+			padding: 0.5rem;
+			margin: 10px -5px;
+		}
+		.top-controls input,
+		.top-controls select,
+		.top-controls button {
+			border-radius: 100px;
+		}
+	}
+	@media screen and (max-width: 900px) {
+		#app {
+			height: 100vh;
+			width: 100vw;
+			margin: 0;
+			border-radius: 0;
 		}
 	}
 </style>

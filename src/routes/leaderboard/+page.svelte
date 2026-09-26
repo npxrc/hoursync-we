@@ -238,4 +238,46 @@
 	li.self {
 		color: var(--gradient-4);
 	}
+	@media screen and (max-width: 1200px) {
+		#app {
+			grid-template-columns: 1fr;
+			grid-template-rows: auto auto;
+			height: calc(100vh - 2rem);
+			overflow-y: auto;
+			gap: 0;
+			margin: 1rem 0;
+		}
+		#left,
+		#right {
+			height: auto;
+			padding: 1.5rem;
+			box-sizing: border-box;
+		}
+		#left :global(h1) {
+			width: 90%;
+		}
+		#left :global(.cards) {
+			height: 100%;
+			width: 100%;
+			overflow: auto;
+		}
+		.left-card {
+			margin-left: 0;
+		}
+		#right {
+			padding-top: 0;
+			border-radius: 0 0 20px 20px;
+		}
+		#right h2:first-of-type {
+			margin-top: 0;
+		}
+	}
+	@media screen and (max-width: 900px) {
+		#app {
+			height: 100vh;
+			width: 100vw;
+			margin: 0;
+			border-radius: 0;
+		}
+	}
 </style>
