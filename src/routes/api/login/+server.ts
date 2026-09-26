@@ -6,6 +6,7 @@ export async function GET() {
 
 export async function POST({ request, cookies, platform }) {
 	try {
+		const now = performance.now();
 		const body = await request.json();
 
 		const { username, password } = body as {
@@ -162,6 +163,8 @@ export async function POST({ request, cookies, platform }) {
 		return Response.json({
 			success: true,
 			message: "Login successful",
+			html,
+			elapsedTime: performance.now() - now,
 		});
 	} catch (error: any) {
 		return Response.json(
