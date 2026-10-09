@@ -154,7 +154,7 @@
 		</Navbar>
 	</div>
 	<div id="right">
-		<h2>Leaderboard</h2>
+		<h2 style="margin-top: 15px;">Leaderboard</h2>
 		<p>Showing leaderboard data for the {currentSemester} semester</p>
 		<ul>
 			{#each leaderboard as student}
@@ -270,6 +270,9 @@
 		}
 		#right h2:first-of-type {
 			margin-top: 0;
+		}
+		:global(.navContainer) {
+			grid-template-columns: 1fr 1fr !important;
 		}
 	}
 	@media screen and (max-width: 900px) {

@@ -158,6 +158,11 @@
 				{ label: "Edit Request", onclick: () => {}, disabled: true },
 				{ label: "Delete Request", onclick: () => {}, disabled: true },
 			]}
+			summaryText={`Submitted ${relativeDate(
+				data.request.Date || ""
+			)} · ${status} · ${data.request.RequestedHours} eHour${
+				parseFloat(data.request.RequestedHours || "") !== 1 ? "s" : ""
+			}`}
 		>
 			{#if loaded}
 				<section class="left-card about-this-request">

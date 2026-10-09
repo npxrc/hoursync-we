@@ -1,8 +1,15 @@
 import * as cheerio from "cheerio";
 import ParseHtmlToRequestList from "../parseHtmlToRequestList.js";
 import type { D1Database } from "@cloudflare/workers-types";
-import type { EHourRequest, EHourRequestList } from "$lib/types.js";
+import type {
+	EHourRequest,
+	EHourRequestList,
+	RequestChange,
+	RequestStatus,
+} from "$lib/types.js";
 import { fetchWithSession, upstreamUrl } from "$lib/server/upstream";
+
+const MAX_RECENT_CHANGES = 20;
 
 export async function GET({ request, platform, cookies }) {
 	// return new Response(null, { status: 405 }); // testing
@@ -48,23 +55,46 @@ export async function GET({ request, platform, cookies }) {
 			user = await db
 				.prepare(
 					`
-					SELECT requestsJson
+					SELECT users.username
+						, users.requestsJson
+						, users.recentChangesJson
 					FROM users
-					WHERE sessionId = ?
+					INNER JOIN sessions ON sessions.username = users.username
+					WHERE sessions.sessionId = ?
 					`
 				)
 				.bind(sessionId)
 				.first<{
+					username: string;
 					requestsJson: string | null;
+					recentChangesJson: string | null;
 				}>();
+
+			if (!user) {
+				return new Response(
+					JSON.stringify({ error: "Session is not registered" }),
+					{
+						status: 401,
+						headers: { "Content-Type": "application/json" },
+					}
+				);
+			}
 
 			const previousRequests = user?.requestsJson
 				? (JSON.parse(user.requestsJson) as EHourRequestList)
 				: null;
+			const persistedChanges = user?.recentChangesJson
+				? (JSON.parse(user.recentChangesJson) as RequestChange[])
+				: [];
 
 			// An initial snapshot is the baseline, not a list of recent changes.
 			if (previousRequests) {
-				changes = diffRequests(previousRequests, requestList);
+				changes = mergeRecentChanges(
+					persistedChanges,
+					diffRequests(previousRequests, requestList)
+				);
+			} else {
+				changes = persistedChanges;
 			}
 
 			let studentId: string | null = null;
@@ -84,15 +114,17 @@ export async function GET({ request, platform, cookies }) {
 					UPDATE users
 					SET studentID = COALESCE(?, studentID),
 						requestsHash = ?,
-						requestsJson = ?
-					WHERE sessionId = ?
+						requestsJson = ?,
+						recentChangesJson = ?
+					WHERE username = ?
 					`
 				)
 				.bind(
 					studentId,
 					fetchedHash,
 					JSON.stringify(requestList),
-					sessionId
+					JSON.stringify(changes),
+					user.username
 				)
 				.run();
 		}
@@ -156,17 +188,6 @@ async function generateHash(requestList: any) {
 		.join("");
 	return hashHex;
 }
-
-type RequestStatus = keyof EHourRequestList;
-
-type RequestChange = {
-	type: "added" | "removed" | "statusChanged" | "updated";
-	requestId: string;
-	previous: EHourRequest | null;
-	current: EHourRequest | null;
-	previousStatus: RequestStatus | null;
-	currentStatus: RequestStatus | null;
-};
 
 function indexRequests(requests: EHourRequestList) {
 	const indexed = new Map<
@@ -256,4 +277,11 @@ function diffRequests(
 	}
 
 	return changes;
+}
+
+function mergeRecentChanges(
+	persistedChanges: RequestChange[],
+	newChanges: RequestChange[]
+): RequestChange[] {
+	return [...persistedChanges, ...newChanges].slice(-MAX_RECENT_CHANGES);
 }

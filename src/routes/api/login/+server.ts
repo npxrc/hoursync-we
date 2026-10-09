@@ -124,20 +124,47 @@ export async function POST({ request, cookies, platform }) {
 				.prepare(
 					`INSERT INTO users (
 						username,
-						sessionId,
 						academy,
 						name,
 						createdAt
 					)
-					VALUES (?, ?, ?, ?, ?)
+					VALUES (?, ?, ?, ?)
 					ON CONFLICT(username) DO UPDATE SET
-						sessionId = excluded.sessionId,
 						academy = excluded.academy,
 						name = excluded.name,
 						createdAt = excluded.createdAt`
 				)
-				.bind(username, sessionId, academy, name, createdAt)
+				.bind(username, academy, name, createdAt)
 				.run();
+
+			const sessionResult = await db
+				.prepare(
+					`INSERT INTO sessions (
+						sessionId,
+						username,
+						createdAt,
+						lastSeenAt
+					)
+					VALUES (?, ?, ?, ?)
+					ON CONFLICT(sessionId) DO UPDATE SET
+						username = excluded.username,
+						lastSeenAt = excluded.lastSeenAt`
+				)
+				.bind(sessionId, username, createdAt, createdAt)
+				.run();
+			if (!sessionResult.success) {
+				throw new Error(sessionResult.error || "Failed to save session");
+			}
+
+			const pruneResult = await db
+				.prepare(
+					"DELETE FROM sessions WHERE lastSeenAt < ?"
+				)
+				.bind(createdAt - 24 * 60 * 60 * 1000)
+				.run();
+			if (!pruneResult.success) {
+				throw new Error(pruneResult.error || "Failed to prune sessions");
+			}
 		} catch (error: any) {
 			throw error;
 		}

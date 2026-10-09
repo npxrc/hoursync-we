@@ -25,7 +25,9 @@
 		<summary>
 			<span class="description">{description}</span>
 			<span class="group-meta">
-				{requests.length} requests · {totalHours} eHours
+				{requests.length} requests · {totalHours} eHour{totalHours !== 1
+					? "s"
+					: ""}
 			</span>
 		</summary>
 

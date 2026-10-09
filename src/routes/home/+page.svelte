@@ -3,6 +3,7 @@
 		Status,
 		type EHourRequest,
 		type EHourRequestList,
+		type RequestChange,
 	} from "$lib/types.js";
 	import { goto } from "$app/navigation";
 	import { onMount } from "svelte";
@@ -16,7 +17,7 @@
 		data: {
 			requests: EHourRequestList;
 			html: string;
-			changes: any;
+			changes: RequestChange[];
 		};
 	} = $props();
 
@@ -88,6 +89,13 @@
 				hour: "2-digit",
 				minute: "2-digit",
 			})
+		);
+	}
+	function changeDescription(change: RequestChange): string {
+		return (
+			change.current?.Description ??
+			change.previous?.Description ??
+			"Request"
 		);
 	}
 	var eHoursCount: string = $state("0");
@@ -293,7 +301,7 @@
 				data = {
 					requests: newData.requests as EHourRequestList,
 					html: newData.html as string,
-					changes: newData.changes as any,
+					changes: newData.changes as RequestChange[],
 				};
 				reloadActive = false;
 			})
@@ -405,6 +413,7 @@
 			titleOptions={{ italic: true, rawHtml: true }}
 			cards={navbarCards}
 			quickActions={navbarQuickActions}
+			summaryText={`${studentAcademy} · ${eHoursCount} eHour${parseFloat(eHoursCount) !== 1 ? "s" : ""} ${data.changes?.length > 0 ? `· ${data.changes?.length} recent change${data.changes?.length !== 1 ? "s" : ""}` : ""}`}
 			version="1.0.3"
 		>
 			<section class="left-card recent-changes">
@@ -413,18 +422,18 @@
 					{#each data.changes as change}
 						<article>
 							{#if change.type === "statusChanged"}
-								<strong>{change.current.Description}</strong>
+								<strong>{changeDescription(change)}</strong>
 								<p>
 									{change.previousStatus} → {change.currentStatus}
 								</p>
 							{:else if change.type === "added"}
-								<strong>{change.current.Description}</strong>
+								<strong>{changeDescription(change)}</strong>
 								<p>New request submitted</p>
 							{:else if change.type === "removed"}
-								<strong>{change.previous.Description}</strong>
+								<strong>{changeDescription(change)}</strong>
 								<p>Request removed</p>
 							{:else}
-								<strong>{change.current.Description}</strong>
+								<strong>{changeDescription(change)}</strong>
 								<p>Request details updated</p>
 							{/if}
 						</article>

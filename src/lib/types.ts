@@ -17,6 +17,15 @@ export interface EHourRequestList {
 	Pending: EHourRequest[];
 	Returned: EHourRequest[];
 }
+export type RequestStatus = keyof EHourRequestList;
+export type RequestChange = {
+	type: "added" | "removed" | "statusChanged" | "updated";
+	requestId: string;
+	previous: EHourRequest | null;
+	current: EHourRequest | null;
+	previousStatus: RequestStatus | null;
+	currentStatus: RequestStatus | null;
+};
 export interface FetchedEHourRequest {
 	Value: string;
 	Date: string | null;

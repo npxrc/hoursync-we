@@ -32,9 +32,10 @@ export async function GET({ request, cookies, platform }) {
 	const user = await userDb
 		.prepare(
 			`
-			SELECT username, studentID
+			SELECT users.username, users.studentID
 			FROM users
-			WHERE sessionId = ?
+			INNER JOIN sessions ON sessions.username = users.username
+			WHERE sessions.sessionId = ?
 		`
 		)
 		.bind(sessionId)
@@ -106,9 +107,10 @@ export async function POST({ request, cookies, platform }) {
 	const user = await userDb
 		.prepare(
 			`
-		SELECT username, studentID
+		SELECT users.username, users.studentID
 		FROM users
-		WHERE sessionId = ?
+		INNER JOIN sessions ON sessions.username = users.username
+		WHERE sessions.sessionId = ?
 		`
 		)
 		.bind(sessionId)

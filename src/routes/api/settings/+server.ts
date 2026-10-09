@@ -31,15 +31,17 @@ export async function GET({ request, cookies, platform }) {
 	const user = await userDb
 		.prepare(
 			`
-			SELECT *
+			SELECT users.*, sessions.sessionId AS currentSessionId
 			FROM users
-			WHERE sessionId = ?
+			INNER JOIN sessions ON sessions.username = users.username
+			WHERE sessions.sessionId = ?
 		`
 		)
 		.bind(sessionId)
 		.first<{
 			username: string;
 			sessionId: string;
+			currentSessionId: string;
 			academy: string;
 			name: string;
 			studentId: string | null;
@@ -67,7 +69,7 @@ export async function GET({ request, cookies, platform }) {
 
 	return json({
 		username: user?.username,
-		sessionId: user?.sessionId,
+		sessionId: user?.currentSessionId,
 		optIns: optins,
 		success: true,
 	});
@@ -102,9 +104,10 @@ export async function POST({ request, cookies, platform }) {
 	const user = await userDb
 		.prepare(
 			`
-			SELECT *
+			SELECT users.*
 			FROM users
-			WHERE sessionId = ?
+			INNER JOIN sessions ON sessions.username = users.username
+			WHERE sessions.sessionId = ?
 		`
 		)
 		.bind(sessionId)
@@ -130,7 +133,9 @@ export async function POST({ request, cookies, platform }) {
 			`
             UPDATE users
             SET optIns = ?
-            WHERE sessionId = ?
+            WHERE username = (
+				SELECT username FROM sessions WHERE sessionId = ?
+			)
         `
 		)
 		.bind(stringOptins, sessionId)

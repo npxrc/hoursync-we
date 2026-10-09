@@ -444,12 +444,9 @@
 
 	@media screen and (max-width: 1200px) {
 		#app {
+			display: grid;
 			grid-template-columns: 1fr;
-			grid-template-rows: auto auto;
-			height: calc(100vh - 2rem);
-			overflow-y: auto;
-			gap: 0;
-			margin: 1rem 0;
+			grid-template-rows: 2fr 3fr;
 		}
 		#left,
 		#right {
@@ -457,26 +454,34 @@
 			padding: 1.5rem;
 			box-sizing: border-box;
 		}
-		#left {
-			display: grid;
-			grid-template-columns: 1fr 2fr;
+		#left :global(h1) {
+			width: 90%;
+		}
+		#left :global(.cards) {
+			height: 100%;
+			width: 100%;
+			overflow: auto;
 		}
 		.left-card {
 			margin-left: 0;
 		}
 		#right {
+			padding-top: 0;
 			border-radius: 0 0 20px 20px;
 		}
-	}
 
-	@media screen and (max-width: 800px) {
-		#left {
-			grid-template-columns: 2fr 3fr;
+		.formQuestions p.label:first-of-type {
+			margin-top: 20px;
 		}
 	}
-	@media screen and (max-width: 700px) {
-		#left {
-			grid-template-columns: 1fr;
+	@media screen and (max-width: 900px) {
+		#app {
+			height: 100vh;
+			width: 100vw;
+			margin: 0;
+			border-radius: 0;
+			display: block;
+			overflow-y: auto;
 		}
 	}
 </style>

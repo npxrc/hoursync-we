@@ -23,6 +23,7 @@
 		cards?: Card[];
 		quickActions?: QuickAction[];
 		version?: string | null;
+		summaryText?: string;
 		children?: Snippet;
 	};
 
@@ -35,6 +36,7 @@
 		cards = [],
 		quickActions = [],
 		version = null,
+		summaryText = "",
 		children,
 	}: Props = $props();
 
@@ -54,7 +56,7 @@
 	});
 </script>
 
-<div class="navContainer">
+<div class="navContainer {isBelow900px ? 'below-900px' : 'above-900px'}">
 	<h1 class="serif {titleOptions.italic ? 'italic' : ''}">
 		{#if titleOptions.rawHtml}
 			{@html title}
@@ -64,7 +66,15 @@
 	</h1>
 	{#if isBelow900px}
 		<details>
-			<summary>More Info</summary>
+			<summary>
+				<span class="description">More Info</span>
+				{#if summaryText}
+					<br />
+					<span class="group-meta">
+						{summaryText}
+					</span>
+				{/if}
+			</summary>
 			<div class="cards">
 				<section class="left-card quick-actions">
 					<b class="head">Quick Actions</b>
@@ -218,6 +228,15 @@
 		cursor: pointer;
 		margin-bottom: 0.5rem;
 	}
+	details[open] .group-meta {
+		display: none;
+	}
+	.group-meta {
+		color: rgba(255, 255, 255, 0.65);
+		font-size: 0.9rem;
+		display: block;
+		width: 100%;
+	}
 
 	@media screen and (max-width: 1200px) {
 		.navContainer {
@@ -239,7 +258,14 @@
 			flex-direction: column;
 		}
 		:global(.left-card) {
+			background: none;
+			border: none;
+			padding: 0;
+			border-radius: 0;
+			margin-bottom: 1rem;
 			margin-left: 0px;
+			font-weight: 500;
+			box-sizing: border-box;
 		}
 	}
 </style>
