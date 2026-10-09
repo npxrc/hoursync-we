@@ -13,12 +13,14 @@ Current features include:
 - **Search, Sort and Reload**: Search your eHour requests (more search features coming soon), sort your eHour requests by a variety of filters, and update the eHour requests without reloading the page.
 - **Copy eHour Requests**: Tired of submitting similar requests over and over again for meetings or work nights? You can now quickly copy a request to make eHour submissions easier.
 - **Automatic Leaderboard Insert**: Sometimes students don't appear on the leaderboard, even if you've made requests during the semester. HourSync Web Edition solves this by automatically calculating where you would be based on your eHours.
+- **Grouped Requests**: HourSync Web Edition automatically groups "HS Internship [1]" and "HS Internship [2]" together, cleaning up clutter on your home page.
 
 Upcoming Features:
 
-- **Grouped Requests**: The home page will automatically group requests like "HS Internship [1]" and "HS Internship [2]".
 - **Request Splitting**: Submission over 99.75 eHours would become possible by automatically splitting requests that cross that threshold into multiple requests, so you can log those trips or large projects easily.
 - **Multiple Drafts**: Switch between requests or simply save a request submission for later with the upcoming multi-draft system.
+- **Global Leaderboard**: Compete with other users across academies who use HourSync.
+- **Profiles**: Customise your own profile and flex your eHours!
 - And way more!
 
 ## How to Use HourSync WE
