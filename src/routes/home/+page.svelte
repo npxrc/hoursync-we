@@ -233,11 +233,21 @@
 				onclick: toLeaderboard,
 			},
 			{
+				label: "View Profile",
+				onclick: () => goto(`/user/${convertedNameToUrl(studentName)}`),
+			},
+			{
 				label: "Sign Out",
 				onclick: signOut,
 			},
 		];
 	});
+	function convertedNameToUrl(name: string): string {
+		// change Jane Smith to jane.smith
+		// or Jane Apple Smith to jane.apple.smith
+		const parts = name.split(" ").map((part) => part.trim());
+		return parts.map((part) => part.toLowerCase()).join(".");
+	}
 	let searchTerm = $state("");
 	let sortOption = $state("dateNewOld");
 	let validSortOptions = [

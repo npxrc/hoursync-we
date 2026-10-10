@@ -116,6 +116,12 @@
 		}
 		return name; // Return the original name if it doesn't match the expected format
 	}
+	function convertedNameToUrl(name: string): string {
+		// change Jane Smith to jane.smith
+		// or Jane Apple Smith to jane.apple.smith
+		const parts = name.split(" ").map((part) => part.trim());
+		return parts.map((part) => part.toLowerCase()).join(".");
+	}
 	function compareNames(name1: string, name2: string): boolean {
 		return name1.trim() === name2.trim();
 	}
@@ -158,21 +164,28 @@
 		<p>Showing leaderboard data for the {currentSemester} semester</p>
 		<ul>
 			{#each leaderboard as student}
-				<li
-					class={compareNames(student.Name, userLeaderName)
-						? "self"
-						: ""}
+				<a
+					href="/user/{convertedNameToUrl(
+						convertStudentName(student.Name)
+					)}"
+					style="text-decoration: none; color: inherit;"
 				>
-					<span class="rank"><b>{student.Rank}</b></span>
-					<span class="data">
-						<p>{convertStudentName(student.Name)}</p>
-						<p>
-							{student.Hours} eHour{student.Hours === "1"
-								? ""
-								: "s"}
-						</p>
-					</span>
-				</li>
+					<li
+						class={compareNames(student.Name, userLeaderName)
+							? "self"
+							: ""}
+					>
+						<span class="rank"><b>{student.Rank}</b></span>
+						<span class="data">
+							<p>{convertStudentName(student.Name)}</p>
+							<p>
+								{student.Hours} eHour{student.Hours === "1"
+									? ""
+									: "s"}
+							</p>
+						</span>
+					</li>
+				</a>
 			{/each}
 		</ul>
 	</div>
