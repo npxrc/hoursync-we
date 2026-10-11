@@ -9,5 +9,6 @@ export async function load({ cookies, fetch, params }) {
 	const response = await fetch("/api/users/" + user);
 	return {
 		user: await response.json(),
+		slug: user,
 	};
 }

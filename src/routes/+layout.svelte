@@ -4,6 +4,24 @@
 </script>
 
 <svelte:head>
+	<title>HourSync</title>
+	<meta name="author" content="Neil Patrao" />
+	<meta
+		name="description"
+		content="The fastest and easiest way to submit eHours for the Olathe District, guaranteed. Built for your future."
+	/>
+
+	<meta property="og:title" content="HourSync" />
+	<meta
+		property="og:description"
+		content="The fastest and easiest way to submit eHours for the Olathe District, guaranteed. Built for your future."
+	/>
+	<meta property="og:image" content="https://hoursync.net/assets/meta.png" />
+	<meta
+		name="keywords"
+		content="HourSync, eHours, HourSync for Web, HourSync for Windows, Olathe Public Schools, academy endorsement, ehours submission"
+	/>
+	<meta property="og:url" content="https://web.hoursync.net/" />
 	<link
 		rel="icon"
 		href="/assets/1x/logo-regular-flat.png"

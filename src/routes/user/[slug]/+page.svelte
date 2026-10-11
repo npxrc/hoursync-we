@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import { onMount } from "svelte";
+	import type { PageData } from "./$types";
 	import Navbar from "../../Navbar.svelte";
 
-	let { data } = $props<{ user: any }>();
+	let { data } = $props<{ data: PageData }>();
 	let navbarQuickActions: QuickAction[] = $state([
 		{
 			label: "Back to Home",
@@ -30,10 +30,7 @@
 		label: string;
 		onclick: () => void;
 	};
-	let user = $state(data.user.name || "Unknown User");
-	onMount(() => {
-		user = location.pathname.split("/").pop() ?? "";
-	});
+	let user = $derived(data.slug);
 
 	// server response for /api/users/[slug]/
 	// return new Response(
@@ -58,6 +55,9 @@
 <svelte:head>
 	<title>HourSync - {user}</title>
 	<meta name="description" content="View the profile for {user}" />
+
+	<meta property="og:title" content="HourSync - {user}" />
+	<meta property="og:description" content="View the profile for {user}" />
 </svelte:head>
 <div id="app">
 	<div id="left">
