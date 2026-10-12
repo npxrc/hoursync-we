@@ -5,8 +5,11 @@
 	let password = $state("");
 	let errorStatusText = $state("");
 	let errorMessage = $state("");
+	let isLoggingIn = $state(false);
 
 	async function login() {
+		if (isLoggingIn) return;
+		isLoggingIn = true;
 		try {
 			errorStatusText = "";
 			errorMessage = "";
@@ -43,7 +46,12 @@
 			}
 		} catch (error) {
 			console.error("Error during login:", error);
+		} finally {
+			isLoggingIn = false;
 		}
+	}
+	function handlePasswordKeydown(event: KeyboardEvent) {
+		if (event.key === "Enter") login();
 	}
 	function ExtractBetween(
 		source: string,
@@ -97,10 +105,12 @@
 				placeholder="Enter your district password"
 				required
 				bind:value={password}
-				onkeydown={login}
+				onkeydown={handlePasswordKeydown}
 			/>
 			<br /><br />
-			<button type="submit" onclick={login}>Sign In</button>
+			<button type="submit" onclick={login} disabled={isLoggingIn}>
+				{isLoggingIn ? "Signing In..." : "Sign In"}
+			</button>
 		</div>
 		<div class="right">
 			<!-- to be added later -->

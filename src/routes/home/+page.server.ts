@@ -16,7 +16,7 @@ export async function load({ cookies, fetch }) {
 		}
 
 		throw error(
-			response.status >= 500 ? 502 : response.status,
+			response.status >= 500 ? 500 : response.status,
 			"Unable to load your eHour requests. Please try again."
 		);
 	}
