@@ -194,11 +194,17 @@
 				{#if data.request.Images.length > 0}
 					<div class="images">
 						{#each data.request.Images as image}
-							<img
-								src={image}
-								alt={"Attached image for " + title}
-								loading="lazy"
-							/>
+							<a
+								href={`/api/image/${image.split("/").pop()}`}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								<img
+									src={image}
+									alt={"Attached image for " + title}
+									loading="lazy"
+								/>
+							</a>
 						{/each}
 					</div>
 				{/if}
