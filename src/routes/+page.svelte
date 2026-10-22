@@ -1,6 +1,18 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
 
+	// Notice state
+	let noticeStart = new Date("2026-10-21T00:00:00Z");
+	let noticeEnd = new Date("2026-10-25T00:00:00Z");
+	let noticeActive = $state(
+		new Date() >= noticeStart && new Date() <= noticeEnd
+	);
+	let noticeHeader = $state("PHP Vulnerability");
+	let noticeMessage = $state(
+		"Due to the global PHP vulnerability, HourSync may be temporarily unable to connect to the district portal while it undergoes an upgrade to mitigate the issue. Learn more at <a href='https://www.php.net/' target='_blank' rel='noopener noreferrer'>PHP</a>."
+	);
+	// Rest of code
+
 	let username = $state("");
 	let password = $state("");
 	let errorStatusText = $state("");
@@ -87,6 +99,10 @@
 			<div class="errorMessage {errorStatusText ? 'active' : ''}">
 				<div class="header">{errorStatusText}</div>
 				<div class="message">{errorMessage}</div>
+			</div>
+			<div class="notice {noticeActive ? 'active' : ''}">
+				<div class="header">{noticeHeader}</div>
+				<div class="message">{@html noticeMessage}</div>
 			</div>
 			<label for="username">District Username</label><br />
 			<input
@@ -213,6 +229,26 @@
 	}
 	.errorMessage .header {
 		font-weight: bold;
+	}
+	.notice {
+		display: none;
+	}
+	.notice.active {
+		border-radius: 10px;
+		display: block;
+		background-color: rgba(200, 200, 200, 0.1);
+		border: 1px solid var(--surface);
+		color: var(--surface);
+		padding: 0.5rem;
+		margin: 0.5rem 0;
+		box-sizing: border-box;
+	}
+	.notice .header {
+		font-weight: bold;
+	}
+	:global(.notice .message a) {
+		color: inherit;
+		text-decoration: underline;
 	}
 
 	@media screen and (max-width: 1300px) {
